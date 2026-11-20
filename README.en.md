@@ -48,8 +48,6 @@ The goal is to move beyond passive video consumption and build a personalized le
 
 **② Run one command on your laptop** — Type `/feed-me-knowledge` in Claude Code. It fetches captions (or a speech-to-text transcript), checks just the relevant frames when a tool or person name is unclear, then summarizes.
 
-<img src="docs/images/02-run.png" width="620" alt="Claude Code run">
-
 **③ Organized in the database** — A new row with sequence number, description, category and tags is added at the bottom, and the processed link is checked off (or marked `(완료)`).
 
 <img src="docs/images/03-db-row.png" alt="New database row">
@@ -106,10 +104,10 @@ Copy `skills/feed-me-knowledge/SKILL.md` to `~/.claude/skills/feed-me-knowledge/
 
 ## Notion setup
 
-**Nothing to create in advance.** On the first `/feed-me-knowledge` run, Claude asks:
+**Nothing to create in advance.** On the first `/feed-me-knowledge` run, Claude asks whether you already have a Notion page for queuing video links and a database for the summaries:
 
-- **Don't have them yet** → it creates an **'작업 대기 영상(URL)' (video queue) page** and a **database** (properties below + a view sorted by sequence number) under a Notion page you choose.
-- **Already have them** → share both links; it connects them and adds any missing properties.
+- **First time (you have neither)** → it creates an **'작업 대기 영상(URL)' (video queue) page** and a **database** (properties below + a view sorted by sequence number) under a Notion page you choose.
+- **You already have both** → share both links; it connects them and adds any missing properties.
 
 Settings are saved to `~/.config/feed-me-knowledge/config.json`, so it won't ask again.
 
