@@ -1,14 +1,14 @@
 ---
-name: youtube-to-notion
-description: Notion '작업 대기 영상(URL)' 페이지에 쌓인 미체크 유튜브·인스타그램 릴스 URL을 watch 스킬로 시청·요약해 Notion 데이터베이스에 영상별 페이지로 정리하고, 처리한 URL을 체크한다. "유튜브 정리", "릴스 정리", "대기 영상 처리", /youtube-to-notion 요청 시 사용.
+name: feed-me-knowledge
+description: Notion '작업 대기 영상(URL)' 페이지에 쌓인 미처리 영상 URL(유튜브·인스타그램 릴스·페이스북·틱톡·X — 체크박스든 그냥 붙여 넣은 링크든)을 watch 스킬로 시청·요약해 Notion 데이터베이스에 영상별 페이지로 정리하고, 처리한 URL을 체크하거나 '(완료)'로 표시한다. "유튜브 정리", "릴스 정리", "대기 영상 처리", /feed-me-knowledge 요청 시 사용.
 user-invocable: true
 ---
 
-# YouTube → Notion 스터디 정리
+# Feed Me Knowledge — 영상 → Notion 스터디 정리
 
 ## 설정 (첫 실행 때 한 번)
 
-설정은 `~/.config/youtube-to-notion/config.json`에 저장한다 (플러그인 파일은 업데이트 때 덮어써지므로 여기에 두지 않는다).
+설정은 `~/.config/feed-me-knowledge/config.json`에 저장한다 (플러그인 파일은 업데이트 때 덮어써지므로 여기에 두지 않는다).
 
 ```json
 {
@@ -18,7 +18,7 @@ user-invocable: true
 }
 ```
 
-- 실행할 때마다 먼저 이 파일을 읽는다.
+- 실행할 때마다 먼저 이 파일을 읽는다. 파일이 없고 예전 이름의 `~/.config/youtube-to-notion/config.json`이 있으면 그 내용을 새 경로로 복사해 쓴다 (이전 사용자 설정 유지).
 - 파일이 없거나 값이 비어 있으면 **첫 실행 셋업**을 한다.
 - **셋업 0단계 — 사전 점검** (하나라도 빠지면 무엇이 없는지와 해결 방법을 알려 주고, 필수 항목이 해결될 때까지 진행하지 않는다):
 
@@ -31,13 +31,13 @@ user-invocable: true
 
 - **셋업 1단계 — Notion 연결.** 먼저 "이미 '작업 대기 영상(URL)' 페이지와 정리용 DB가 있나요?"라고 묻는다.
   - **있다** → '작업 대기 영상(URL)' 페이지 링크와 DB 링크를 받는다 → 페이지 링크에서 32자리 ID를 뽑고, DB는 fetch해 `<data-source url="collection://...">` 값을 얻는다 → DB에 아래 "필요한 속성"이 있는지 확인하고, 빠진 게 있으면 추가할지 물은 뒤 `update-data-source`의 `ADD COLUMN`으로 추가한다.
-  - **없다** → "어느 Notion 페이지 아래에 만들까요?"라고 부모 페이지 링크를 받는다 (없다고 하면 `create-pages`의 `creation_mode: "draft"`로 비공개 페이지 "YouTube 스터디"를 먼저 만들어 부모로 쓴다). 그 아래에 다음을 만든다:
-    1. **정리용 DB**: `create-database` (parent = 부모 페이지, title "유튜브 스터디"), schema:
+  - **없다** → "어느 Notion 페이지 아래에 만들까요?"라고 부모 페이지 링크를 받는다 (없다고 하면 `create-pages`의 `creation_mode: "draft"`로 비공개 페이지 "영상 스터디"를 먼저 만들어 부모로 쓴다). 그 아래에 다음을 만든다:
+    1. **정리용 DB**: `create-database` (parent = 부모 페이지, title "영상 스터디"), schema:
        `CREATE TABLE ("이름" TITLE, "순번" NUMBER, "영상 제목" RICH_TEXT, "채널" SELECT(), "설명" RICH_TEXT, "태그" MULTI_SELECT(), "기록날짜" DATE, "영상날짜" DATE, "스터디 분류" MULTI_SELECT('기초지식':default, '공부법':green, '최신APP':pink))`
        → 결과의 `collection://...`가 `data_source`.
     2. **정렬 보기**: DB를 fetch해 기본 보기(`view://...`)를 찾고 `update-view`로 `name: "전체"`, `configure: SORT BY "순번" ASC; SHOW "순번", "이름", "설명", "스터디 분류", "태그", "채널", "기록날짜", "영상날짜", "영상 제목"`.
-    3. **작업 대기 영상(URL) 페이지**: `create-pages` (parent = 부모 페이지, icon 🗂️, title "작업 대기 영상(URL)"), 내용은 사용법 콜아웃(💡 "아래 할 일(체크박스)에 유튜브나 인스타그램 릴스 링크를 붙여 넣으세요. 여러 개면 체크박스를 늘리면 됩니다. `/youtube-to-notion`을 실행하면 체크되지 않은 항목만 정리하고 자동으로 체크합니다.") + 그 아래 링크 없는 체크박스 `- [ ] 링크입력` 하나 (사용자가 여기에 링크를 붙여 넣는 자리. 실제 유튜브 링크를 예시로 넣지 말 것 — 그대로 처리 대상이 됨).
-    4. 만든 두 페이지 링크를 사용자에게 알려 주고, "'작업 대기 영상(URL)' 페이지에 `- [ ] [제목](URL)` 형식으로 링크를 넣은 뒤 다시 실행하세요"라고 안내한다.
+    3. **작업 대기 영상(URL) 페이지**: `create-pages` (parent = 부모 페이지, icon 🗂️, title "작업 대기 영상(URL)"), 내용은 사용법 콜아웃(💡 "아래에 영상 링크(유튜브·인스타그램 릴스·페이스북·틱톡·X)를 그냥 붙여 넣거나 체크박스에 넣으세요. `/feed-me-knowledge`을 실행하면 아직 처리 안 된 링크만 정리하고, 체크박스는 체크·그냥 링크는 끝에 (완료)를 붙입니다.") + 그 아래 링크 없는 체크박스 `- [ ] 링크입력` 하나 (사용자가 여기에 링크를 붙여 넣는 자리. 실제 유튜브 링크를 예시로 넣지 말 것 — 그대로 처리 대상이 됨).
+    4. 만든 두 페이지 링크를 사용자에게 알려 주고, "'작업 대기 영상(URL)' 페이지에 영상 링크를 붙여 넣은 뒤(체크박스 `- [ ] [제목](URL)` 또는 그냥 링크) 다시 실행하세요"라고 안내한다.
   - 마지막으로 설정 파일을 저장한다.
 - `log_file`(선택): 실행 기록을 남길 md 파일 경로. 비어 있으면 실행 기록 단계를 건너뛴다.
 - 이하 본문의 `INBOX_PAGE_ID`, `DATA_SOURCE`, `LOG_FILE`은 이 파일의 값을 뜻한다.
@@ -47,8 +47,10 @@ user-invocable: true
 ## 고정 대상
 
 - **'작업 대기 영상(URL)' 페이지:** `INBOX_PAGE_ID`
-  - 항목 형식: `- [ ] [제목](URL)` — `- [ ]`만 처리 대상, `- [x]`는 완료.
-  - 지원 URL: 유튜브(`youtube.com`, `youtu.be`), 인스타그램 릴스(`instagram.com/reel/`, `instagram.com/p/`). 그 외 링크는 건너뛰고 "지원 안 함"으로 보고.
+  - 항목 형식 — 아래 어느 형태든 받는다 (Notion이 익숙하지 않은 사람은 링크만 붙여 넣음):
+    - 체크박스: `- [ ] [제목](URL)` → 처리 대상. `- [x]`는 완료.
+    - 그냥 붙여 넣은 링크: 일반 줄·불릿·번호 목록의 URL, `[제목](URL)`, `<URL>`, 북마크·임베드·`<video>` 블록 등 → 같은 줄(블록)에 `(완료)`가 없고 취소선(`~~…~~`)이 아니면 처리 대상.
+  - 지원 URL: yt-dlp가 로그인 없이 받을 수 있는 공개 영상 링크. 확인된 것: 유튜브(`youtube.com`, `youtu.be`), 인스타그램 릴스(`instagram.com/reel/`, `/p/`), 페이스북(`facebook.com/…/videos/`, `facebook.com/watch`, `fb.watch`), 틱톡 영상(`tiktok.com/@…/video/`), X(트위터) 영상(`x.com`·`twitter.com/…/status/`). 영상이 없는 링크(일반 웹페이지, 틱톡 사진 슬라이드 `/photo/` 등)는 yt-dlp가 `No video`/`Unsupported URL` 오류를 내므로 건너뛰고 "영상 아님"으로 보고 — 표시(체크·완료)는 하지 않는다.
 - **정리용 DB data source:** `DATA_SOURCE`
   - 속성: `이름`(title), `순번`(number), `영상 제목`(text), `채널`(select), `설명`(text), `태그`(multi_select), `기록날짜`(date), `영상날짜`(date), `스터디 분류`(multi_select)
 
@@ -61,7 +63,7 @@ user-invocable: true
 
 ## 절차
 
-1. **대기 목록 수집:** Notion fetch로 '작업 대기 영상(URL)' 페이지를 읽고 `- [ ]` 항목의 유튜브·릴스 URL을 모은다. 영상 링크가 없는 미체크 항목(예: 안내용 "링크입력" 체크박스)은 처리 대상이 아니므로 조용히 건너뛴다 — 실패로 보고하지도, 체크하지도 않는다. 없으면 "대기 영상 없음"을 보고하고 종료.
+1. **대기 목록 수집:** Notion fetch로 '작업 대기 영상(URL)' 페이지를 읽고, 위 '항목 형식'의 처리 대상 URL을 페이지 위→아래 순서로 모은다 (콜아웃 안 안내 문구의 링크는 제외). 같은 URL이 여러 줄에 있으면 한 번만 처리하고 표시는 모든 줄에 한다. 영상 링크가 없는 미체크 항목(예: 안내용 "링크입력" 체크박스)은 처리 대상이 아니므로 조용히 건너뛴다 — 실패로 보고하지도, 체크하지도 않는다. 없으면 "대기 영상 없음"을 보고하고 종료.
 2. **DB 스키마·순번 확인:** data source를 fetch해 현재 `채널`/`태그`/`스터디 분류` 옵션 목록을 확인하고, SQL로 `SELECT COALESCE(MAX("순번"), 0)`을 조회해 (빈 DB면 0) 다음 순번(= 최댓값 + 1)을 정한다. 영상마다 1씩 늘린다.
 3. **영상마다 순서대로** (한 영상 실패해도 다음 영상 계속):
    1. **시청:** watch 스킬 절차대로 실행한다 (스크립트 경로: `~/.claude/plugins/cache/claude-video/watch/*/scripts/watch.py`, Windows는 `python`).
@@ -76,6 +78,7 @@ user-invocable: true
       - 자동 자막은 도구·레포·인물 이름을 잘못 받아쓰는 경우가 많다. 이름이 애매하면 영상 전체 대신 그 이름이 처음 나오는 시점의 프레임만 몇 장 뽑아 확인한다:
         `yt-dlp -q -f "bv*[height<=720][ext=mp4]/b[height<=720]" -o v.mp4 <URL>` → `ffmpeg -loglevel error -y -ss HH:MM:SS -i v.mp4 -frames:v 1 -vf scale=1024:-1 f_HHMMSS.jpg`
       - 메타데이터: `yt-dlp --skip-download --print "%(title)s|%(channel)s|%(duration_string)s|%(upload_date)s|%(thumbnail)s" <URL>`
+      - **페이스북·틱톡·X 영상:** 릴스와 같이 처리한다 (자막이 없으면 Whisper, 메타데이터는 `%(uploader)s`·description, 썸네일은 주소가 만료되므로 `create-attachment`로 업로드, 짧으면 '릴스 본문 형식'). 원제목이 있으면(페이스북 `title`) 그걸 `영상 제목`에 쓴다.
       - **인스타그램 릴스:** 로그인 없이 yt-dlp로 받아진다. 메타데이터는 `--print "%(uploader)s|%(duration_string)s|%(upload_date)s|%(thumbnail)s" --print description`. 릴스는 자막이 없으므로 watch를 Groq Whisper로 돌려 받아쓰기한다 (`--max-frames 6`, 길이도 watch 리포트의 Duration을 쓴다). 캡션(description)은 보조 자료로만 쓰고, "댓글에 OO 달면 자료 보내 줌" 같은 홍보 문구는 요약에서 뺀다.
    2. **분류·태그 결정:**
       - `채널`: 기존 옵션에 없는 채널이면 새 옵션으로 추가한다 (select). 릴스는 작성자 계정 표시 이름(`uploader`).
@@ -85,7 +88,9 @@ user-invocable: true
    3. **중복 확인 후 페이지 생성:** 먼저 SQL로 같은 영상의 페이지가 이미 있는지 조회한다 — `SELECT url FROM "<data source>" WHERE "영상 제목" = ?` (params: `영상 제목` 속성에 넣을 값). 결과가 없으면 제목 일부를 코드 표기로 감싼 경우일 수 있으니 `WHERE "영상 제목" LIKE ?` (params: 원제목 앞 20자 + `%`)로 한 번 더 조회한다.
       - **이미 있으면** 새로 만들지 않는다(이전 실행에서 생성 후 체크만 실패한 경우). 바로 4단계 체크로 넘어가고, 보고에 "기존 페이지 있음 → 체크만 함"으로 적는다. 순번도 소비하지 않는다.
       - **없으면** `create-pages`(parent = 위 data source)로 아래 형식의 페이지를 만든다 (릴스는 '릴스 본문 형식').
-   4. **체크:** 생성에 성공한 경우에만 '작업 대기 영상(URL)' 페이지에서 해당 줄을 `update_content`로 `- [ ]` → `- [x]`로 바꾼다 (old_str는 해당 줄 전체). 링크 텍스트에 보이지 않는 문자가 있으면 매칭이 실패하므로, 실패 시 `- [ ] [제목 앞 몇 글자`로 재시도하고, 그래도 실패하면 남은 미체크 항목이 하나일 때만 `- [ ] `로 바꾼다. 그 외엔 실패로 보고. 릴스는 링크 텍스트가 URL 자체라 `- [ ] [https://www.instagram.com/reel/<릴스ID>/`까지만 old_str로 쓴다.
+   4. **완료 표시:** 생성에 성공한 경우에만 '작업 대기 영상(URL)' 페이지에서 해당 줄을 `update_content`로 표시한다.
+      - **체크박스가 아닌 줄**(그냥 붙여 넣은 링크): 줄 끝에 ` (완료)`를 붙인다 — old_str는 URL이 들어간 부분, new_str는 같은 내용 + ` (완료)`. 북마크·임베드·`<video>` 같은 블록이면 블록은 그대로 두고 바로 아래에 `(완료) URL` 한 줄을 넣는다. 다음 실행 때 이 `(완료)`가 있는 URL은 처리 대상에서 뺀다.
+      - **체크박스 줄**: `- [ ]` → `- [x]`로 바꾼다 (old_str는 해당 줄 전체). 링크 텍스트에 보이지 않는 문자가 있으면 매칭이 실패하므로, 실패 시 `- [ ] [제목 앞 몇 글자`로 재시도하고, 그래도 실패하면 남은 미체크 항목이 하나일 때만 `- [ ] `로 바꾼다. 그 외엔 실패로 보고. 릴스는 링크 텍스트가 URL 자체라 `- [ ] [https://www.instagram.com/reel/<릴스ID>/`까지만 old_str로 쓴다.
 4. **순서:** DB 보기는 `순번` 오름차순 정렬이므로 순번만 제대로 넣으면 새 페이지가 맨 아래로 쌓인다.
 5. **실행 기록 (선택):** `LOG_FILE`이 설정돼 있고 1건 이상 처리(성공 또는 실패)했으면 그 파일의 `## 실행 기록` 표 맨 아래에 한 줄을 추가한다 (Edit 도구). 설정이 없거나 대기 영상이 없었으면 건너뛴다.
    - 형식: `| YYYY-MM-DD | 성공 N건 / 실패 M건 | [페이지 제목](Notion URL), ... / 실패: 영상제목(사유) |`
@@ -149,7 +154,7 @@ user-invocable: true
 ```
 ~~~
 
-## 릴스 본문 형식 (1분 안팎 짧은 영상)
+## 릴스 본문 형식 (1분 안팎 짧은 영상 — 릴스·틱톡·페이스북·X 공통, '작성자' 줄의 플랫폼 이름만 바꿈)
 
 ~~~
 <image source="file-upload://..." />

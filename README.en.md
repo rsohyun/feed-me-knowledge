@@ -1,14 +1,17 @@
 [한국어](README.md) | **English**
 
-# youtube-to-notion
+# feed-me-knowledge
 
-> A Claude Code skill: queue YouTube and Instagram reel links on a Notion page, run `/youtube-to-notion`, and each video gets summarized into its own page in a Notion database.
+> 🍽️ Feed it videos, get knowledge back. (Formerly `youtube-to-notion` — existing settings carry over.)
+
+> A Claude Code skill: queue video links (YouTube, Instagram reels, Facebook, TikTok, X) on a Notion page, run `/feed-me-knowledge`, and each video gets summarized into its own page in a Notion database.
 
 - Uses captions when available; **transcribes with Groq Whisper when there are none**.
-- **Instagram reels are supported too**, with a shorter page format; the thumbnail is uploaded to Notion so it never expires.
+- **Beyond YouTube: Instagram reels, Facebook, TikTok and X (Twitter) videos are supported**, with a shorter page format for short videos; thumbnails are uploaded to Notion so they never expire.
+- **Just paste the link.** No checkbox or numbering needed — unprocessed links are found automatically.
 - One Notion page per video: thumbnail, video info, one-line summary, key-points table, section-by-section notes, and a structure tree.
 - Reuses existing channel / tag / category options and adds new ones when needed.
-- Processed links are checked off (`- [x]`) in the '작업 대기 영상(URL)' page; failed videos are retried on the next run.
+- Processed links are marked automatically — checkboxes get checked (`- [x]`), plain links get `(완료)` ("done") appended. Failed videos are retried on the next run.
 
 > Note: the skill instructions and the generated summaries are in **Korean**. To get summaries in another language, edit the "한국어로 작성" (write in Korean) line in `SKILL.md`.
 
@@ -22,9 +25,9 @@ I wanted a way to go beyond simply saving videos: a personal learning environmen
 
 ## 🎯 The Solution
 
-To address this challenge, I built `youtube-to-notion`, a custom skill for Claude Code.
+To address this challenge, I built `feed-me-knowledge`, a custom skill for Claude Code.
 
-I use Notion as a centralized video queue for YouTube URLs, making it easy to save videos on the go from my phone. When I run the `/youtube-to-notion` skill in Claude Code on my laptop, it automatically identifies unprocessed URLs, analyzes each video's subtitles (or a speech-to-text transcript when there are none) and visual content, and generates a structured summary in a new Notion page.
+I use Notion as a centralized video queue for video URLs, making it easy to save videos on the go from my phone. When I run the `/feed-me-knowledge` skill in Claude Code on my laptop, it automatically identifies unprocessed URLs, analyzes each video's subtitles (or a speech-to-text transcript when there are none) and visual content, and generates a structured summary in a new Notion page.
 
 This turns a simple collection of video links into an organized, searchable knowledge base.
 
@@ -39,15 +42,15 @@ The goal is to move beyond passive video consumption and build a personalized le
 
 ## 📸 Example
 
-**① Queue video links** — On the go, paste links into the Notion '작업 대기 영상(URL)' (video queue) page from your phone. Unchecked items are the ones to process.
+**① Queue video links** — On the go, paste links into the Notion '작업 대기 영상(URL)' (video queue) page from your phone — as checkbox items or just plain links. Anything not yet checked or marked `(완료)` gets processed.
 
 <img src="docs/images/01-queue.png" width="520" alt="Video queue page">
 
-**② Run one command on your laptop** — Type `/youtube-to-notion` in Claude Code. It fetches captions (or a speech-to-text transcript), checks just the relevant frames when a tool or person name is unclear, then summarizes.
+**② Run one command on your laptop** — Type `/feed-me-knowledge` in Claude Code. It fetches captions (or a speech-to-text transcript), checks just the relevant frames when a tool or person name is unclear, then summarizes.
 
 <img src="docs/images/02-run.png" width="620" alt="Claude Code run">
 
-**③ Organized in the database** — A new row with sequence number, description, category and tags is added at the bottom, and the processed link is checked off.
+**③ Organized in the database** — A new row with sequence number, description, category and tags is added at the bottom, and the processed link is checked off (or marked `(완료)`).
 
 <img src="docs/images/03-db-row.png" alt="New database row">
 <img src="docs/images/04-checked.png" width="520" alt="Checked-off link">
@@ -65,12 +68,12 @@ The goal is to move beyond passive video consumption and build a personalized le
 ## How it works
 
 ```
-Notion '작업 대기 영상(URL)' (video queue) page (- [ ] YouTube / reel link)
-  → /youtube-to-notion
+Notion '작업 대기 영상(URL)' (video queue) page (checkbox or plain video link)
+  → /feed-me-knowledge
   → watch skill (yt-dlp + ffmpeg): captions + metadata, Groq Whisper if no captions
   → write summary, pick channel / tags / category
   → new page in the Notion DB (sequence number +1)
-  → check off the line in the '작업 대기 영상(URL)' page
+  → check off the line, or append (완료) to a plain link
 ```
 
 ## Requirements
@@ -81,7 +84,7 @@ Notion '작업 대기 영상(URL)' (video queue) page (- [ ] YouTube / reel link
 | Notion connector | Connect Notion in the Claude app |
 | [watch skill](https://github.com/bradautomates/claude-video) | **Required dependency** for download, captions and transcription |
 | yt-dlp, ffmpeg | Used by watch (Windows: `winget install yt-dlp.yt-dlp`, `winget install Gyan.FFmpeg`) |
-| Groq API key (optional) | For videos without captions and Instagram reels; otherwise frames only |
+| Groq API key (optional) | For videos without captions (reels, TikTok, Facebook…); otherwise frames only |
 
 ## Install
 
@@ -89,7 +92,7 @@ Two lines in Claude Code (Claude Code 2.1.275 or later):
 
 ```
 /plugin install watch --marketplace bradautomates/claude-video
-/plugin install youtube-to-notion --marketplace rsohyun/youtube-to-notion
+/plugin install feed-me-knowledge --marketplace rsohyun/feed-me-knowledge
 ```
 
 - The first line installs the required [watch skill](https://github.com/bradautomates/claude-video). Follow its setup to get yt-dlp and ffmpeg.
@@ -98,23 +101,36 @@ Two lines in Claude Code (Claude Code 2.1.275 or later):
 <details>
 <summary>Manual install (without plugins)</summary>
 
-Copy `skills/youtube-to-notion/SKILL.md` to `~/.claude/skills/youtube-to-notion/SKILL.md` (everywhere) or `<project>/.claude/skills/youtube-to-notion/SKILL.md` (one project).
+Copy `skills/feed-me-knowledge/SKILL.md` to `~/.claude/skills/feed-me-knowledge/SKILL.md` (everywhere) or `<project>/.claude/skills/feed-me-knowledge/SKILL.md` (one project).
 </details>
 
 ## Notion setup
 
-**Nothing to create in advance.** On the first `/youtube-to-notion` run, Claude asks:
+**Nothing to create in advance.** On the first `/feed-me-knowledge` run, Claude asks:
 
 - **Don't have them yet** → it creates an **'작업 대기 영상(URL)' (video queue) page** and a **database** (properties below + a view sorted by sequence number) under a Notion page you choose.
 - **Already have them** → share both links; it connects them and adds any missing properties.
 
-Settings are saved to `~/.config/youtube-to-notion/config.json`, so it won't ask again.
+Settings are saved to `~/.config/feed-me-knowledge/config.json`, so it won't ask again.
 
-Then queue links on the '작업 대기 영상(URL)' page as a checklist:
+Then queue links on the '작업 대기 영상(URL)' page. Both styles work, and you can mix them:
 
 ```
-- [ ] [Video title](https://youtu.be/...)
+- [ ] [Video title](https://youtu.be/...)      ← checkbox (checked when done)
+https://www.tiktok.com/@user/video/...         ← plain link ((완료) appended when done)
 ```
+
+### Supported sources
+
+| Source | Link example | Transcript |
+|--------|--------------|------------|
+| YouTube | `youtube.com`, `youtu.be` | Captions, else Whisper |
+| Instagram reels | `instagram.com/reel/` | Whisper |
+| Facebook | `facebook.com/watch`, `fb.watch` | Whisper |
+| TikTok | `tiktok.com/@…/video/` | Whisper |
+| X (Twitter) | `x.com/…/status/` | Captions, else Whisper |
+
+Links without a video (regular web pages, TikTok photo slideshows, etc.) are reported as "not a video" and skipped.
 
 <details>
 <summary>Database properties (reference — created automatically)</summary>
@@ -123,8 +139,8 @@ Then queue links on the '작업 대기 영상(URL)' page as a checklist:
 |----------|------|---------|
 | 이름 | Title | Short topic name |
 | 순번 | Number | Auto-incrementing sequence (sort key) |
-| 영상 제목 | Text | Original video title (reels: first caption line) |
-| 채널 | Select | YouTube channel / reel author |
+| 영상 제목 | Text | Original title (untitled short videos: first caption line) |
+| 채널 | Select | YouTube channel / short-video author |
 | 설명 | Text | One-line description |
 | 태그 | Multi-select | Tools / features / people in the video |
 | 기록날짜 | Date | Date recorded |
@@ -137,16 +153,16 @@ Then queue links on the '작업 대기 영상(URL)' page as a checklist:
 In Claude Code:
 
 ```
-/youtube-to-notion
+/feed-me-knowledge
 ```
 
-(It may appear as `/youtube-to-notion:youtube-to-notion` when installed as a plugin.) You get a list of successes / failures with links to the new pages.
+(It may appear as `/feed-me-knowledge:feed-me-knowledge` when installed as a plugin.) You get a list of successes / failures with links to the new pages.
 
 ## Notes
 
 - One failed video doesn't stop the rest.
-- For videos without captions and reels, audio is sent to Groq's servers.
-- Only public Instagram reels (downloadable without login) are supported.
+- For videos without captions, audio is sent to Groq's servers.
+- Only public videos downloadable without login are supported.
 - Very long videos may hit Groq's upload size limit.
 
 ## Acknowledgements

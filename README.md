@@ -1,14 +1,17 @@
 **한국어** | [English](README.en.md)
 
-# youtube-to-notion
+# feed-me-knowledge
 
-> Notion 페이지에 유튜브·인스타그램 릴스 링크를 쌓아 두고, Claude Code에서 `/youtube-to-notion` 한 번이면 영상을 요약해 Notion 데이터베이스에 정리해 주는 Claude Code 스킬.
+> 🍽️ 영상을 먹여 주면 지식으로 소화해 주는 스킬. (이전 이름: `youtube-to-notion` — 기존 설정은 그대로 이어집니다)
+
+> Notion 페이지에 영상 링크(유튜브·인스타그램 릴스·페이스북·틱톡·X)를 쌓아 두고, Claude Code에서 `/feed-me-knowledge` 한 번이면 영상을 요약해 Notion 데이터베이스에 정리해 주는 Claude Code 스킬.
 
 - 자막이 있으면 자막으로, **자막이 없으면 Groq Whisper로 받아써서** 정리합니다.
-- **인스타그램 릴스도 지원합니다.** 짧은 영상에 맞춘 간단한 형식으로 정리하고, 썸네일은 만료되지 않도록 Notion에 직접 올립니다.
+- **유튜브 말고도 인스타그램 릴스·페이스북·틱톡·X(트위터) 영상을 지원합니다.** 짧은 영상은 간단한 형식으로 정리하고, 썸네일은 만료되지 않도록 Notion에 직접 올립니다.
+- **링크만 붙여 넣어도 됩니다.** 체크박스나 번호 없이 링크만 넣어도 처리 안 된 링크를 알아서 찾습니다.
 - 영상마다 Notion 페이지 1개: 썸네일, 영상 정보, 한 줄 요약, 핵심 요약 표, 흐름별 섹션, 전체 구조 트리.
 - 채널·태그·분류는 기존 선택지를 재사용하고, 없으면 자동으로 추가합니다.
-- 처리한 링크는 '작업 대기 영상(URL)' 페이지에서 자동으로 체크(`- [x]`)되고, 실패한 영상은 다음 실행 때 다시 시도합니다.
+- 처리한 링크는 자동으로 표시됩니다 — 체크박스는 체크(`- [x]`), 그냥 붙여 넣은 링크는 끝에 `(완료)`. 실패한 영상은 다음 실행 때 다시 시도합니다.
 
 ## 💡 개발 배경
 
@@ -18,9 +21,9 @@
 
 ## 🎯 해결 방법
 
-이러한 불편함을 해결하기 위해 Claude Code의 커스텀 스킬인 `youtube-to-notion`을 개발했습니다.
+이러한 불편함을 해결하기 위해 Claude Code의 커스텀 스킬인 `feed-me-knowledge`을 개발했습니다.
 
-모바일에서도 쉽게 접근할 수 있는 Notion에 유튜브 URL을 모아두고, 노트북에서 Claude Code의 `/youtube-to-notion` 스킬을 실행하면 미처리 영상을 자동으로 확인합니다. AI가 영상의 자막(없으면 음성 받아쓰기)과 화면 정보를 바탕으로 핵심 내용을 요약하고, 정리된 결과를 Notion의 별도 페이지에 저장합니다.
+모바일에서도 쉽게 접근할 수 있는 Notion에 영상 URL을 모아두고, 노트북에서 Claude Code의 `/feed-me-knowledge` 스킬을 실행하면 미처리 영상을 자동으로 확인합니다. AI가 영상의 자막(없으면 음성 받아쓰기)과 화면 정보를 바탕으로 핵심 내용을 요약하고, 정리된 결과를 Notion의 별도 페이지에 저장합니다.
 
 ## 🚀 기대 효과
 
@@ -33,15 +36,15 @@
 
 ## 📸 사용 예시
 
-**① 영상 링크 쌓아 두기** — 출퇴근길에 휴대폰으로 Notion '작업 대기 영상(URL)' 페이지에 링크를 붙여 넣습니다. 체크가 안 된 항목이 처리 대상입니다.
+**① 영상 링크 쌓아 두기** — 출퇴근길에 휴대폰으로 Notion '작업 대기 영상(URL)' 페이지에 링크를 붙여 넣습니다. 체크박스에 넣어도, 링크만 붙여 넣어도 됩니다. 체크나 `(완료)` 표시가 없는 링크가 처리 대상입니다.
 
 <img src="docs/images/01-queue.png" width="520" alt="작업 대기 영상(URL) 페이지">
 
-**② 노트북에서 한 줄 실행** — Claude Code에서 `/youtube-to-notion`을 입력하면 자막(없으면 음성 받아쓰기)을 받고, 도구·인물 이름이 애매하면 해당 장면만 캡처해 확인한 뒤 요약합니다.
+**② 노트북에서 한 줄 실행** — Claude Code에서 `/feed-me-knowledge`을 입력하면 자막(없으면 음성 받아쓰기)을 받고, 도구·인물 이름이 애매하면 해당 장면만 캡처해 확인한 뒤 요약합니다.
 
 <img src="docs/images/02-run.png" width="620" alt="Claude Code 실행 화면">
 
-**③ 데이터베이스에 정리 완료** — 순번·설명·분류·태그가 채워진 새 행이 맨 아래에 쌓이고, 처리한 링크는 자동으로 체크됩니다.
+**③ 데이터베이스에 정리 완료** — 순번·설명·분류·태그가 채워진 새 행이 맨 아래에 쌓이고, 처리한 링크는 자동으로 체크(또는 `(완료)` 표시)됩니다.
 
 <img src="docs/images/03-db-row.png" alt="데이터베이스에 추가된 행">
 <img src="docs/images/04-checked.png" width="520" alt="자동 체크된 링크">
@@ -57,12 +60,12 @@
 ## 동작 흐름
 
 ```
-Notion '작업 대기 영상(URL)' 페이지 (- [ ] 유튜브·릴스 링크)
-  → /youtube-to-notion
+Notion '작업 대기 영상(URL)' 페이지 (체크박스 또는 그냥 붙여 넣은 영상 링크)
+  → /feed-me-knowledge
   → watch 스킬 (yt-dlp + ffmpeg): 자막·메타데이터, 자막 없으면 Groq Whisper
   → 요약 작성, 채널·태그·분류 결정
   → Notion DB에 새 페이지 (순번 +1)
-  → '작업 대기 영상(URL)' 페이지 해당 줄 - [x] 체크
+  → '작업 대기 영상(URL)' 페이지 해당 줄 - [x] 체크 / 링크 끝에 (완료)
 ```
 
 ## 필요한 것
@@ -73,7 +76,7 @@ Notion '작업 대기 영상(URL)' 페이지 (- [ ] 유튜브·릴스 링크)
 | Notion 커넥터 | Claude 앱에서 Notion을 연결 |
 | [watch 스킬](https://github.com/bradautomates/claude-video) | 영상 다운로드·자막·받아쓰기를 담당하는 **필수 의존성** |
 | yt-dlp, ffmpeg | watch 스킬이 사용 (Windows는 `winget install yt-dlp.yt-dlp`, `winget install Gyan.FFmpeg`) |
-| Groq API 키 (선택) | 자막 없는 영상·인스타그램 릴스용. 없으면 화면 캡처만으로 정리 |
+| Groq API 키 (선택) | 자막 없는 영상(릴스·틱톡·페이스북 등)용. 없으면 화면 캡처만으로 정리 |
 
 ## 설치
 
@@ -81,7 +84,7 @@ Claude Code에서 두 줄이면 됩니다 (Claude Code 2.1.275 이상).
 
 ```
 /plugin install watch --marketplace bradautomates/claude-video
-/plugin install youtube-to-notion --marketplace rsohyun/youtube-to-notion
+/plugin install feed-me-knowledge --marketplace rsohyun/feed-me-knowledge
 ```
 
 - 첫 줄은 필수 의존성인 [watch 스킬](https://github.com/bradautomates/claude-video)입니다. 설치 후 watch 안내에 따라 yt-dlp·ffmpeg를 준비하세요.
@@ -90,23 +93,36 @@ Claude Code에서 두 줄이면 됩니다 (Claude Code 2.1.275 이상).
 <details>
 <summary>플러그인 없이 수동 설치</summary>
 
-`skills/youtube-to-notion/SKILL.md`를 `~/.claude/skills/youtube-to-notion/SKILL.md`(어디서나) 또는 `<프로젝트>/.claude/skills/youtube-to-notion/SKILL.md`(그 프로젝트에서만)에 복사합니다.
+`skills/feed-me-knowledge/SKILL.md`를 `~/.claude/skills/feed-me-knowledge/SKILL.md`(어디서나) 또는 `<프로젝트>/.claude/skills/feed-me-knowledge/SKILL.md`(그 프로젝트에서만)에 복사합니다.
 </details>
 
 ## Notion 준비
 
-**미리 만들 것은 없습니다.** 처음 `/youtube-to-notion`을 실행하면 Claude가 묻습니다.
+**미리 만들 것은 없습니다.** 처음 `/feed-me-knowledge`을 실행하면 Claude가 묻습니다.
 
 - **아직 없다** → 원하는 Notion 페이지 아래에 **작업 대기 영상(URL) 페이지**와 **정리용 데이터베이스**(아래 속성 + 순번 정렬 보기)를 자동으로 만들어 줍니다.
 - **이미 있다** → 두 링크를 알려 주면 연결하고, DB에 빠진 속성이 있으면 추가해 줍니다.
 
-설정은 `~/.config/youtube-to-notion/config.json`에 저장되어, 다음부터는 묻지 않습니다.
+설정은 `~/.config/feed-me-knowledge/config.json`에 저장되어, 다음부터는 묻지 않습니다.
 
-그다음 '작업 대기 영상(URL)' 페이지에 체크리스트로 링크를 쌓으면 됩니다.
+그다음 '작업 대기 영상(URL)' 페이지에 링크를 쌓으면 됩니다. 아래 두 방식 모두 되고, 섞어 써도 됩니다.
 
 ```
-- [ ] [영상 제목](https://youtu.be/...)
+- [ ] [영상 제목](https://youtu.be/...)        ← 체크박스 (처리 후 체크)
+https://www.tiktok.com/@user/video/...         ← 링크만 (처리 후 끝에 (완료))
 ```
+
+### 지원 채널
+
+| 채널 | 링크 예 | 받아쓰기 |
+|------|---------|----------|
+| 유튜브 | `youtube.com`, `youtu.be` | 자막, 없으면 Whisper |
+| 인스타그램 릴스 | `instagram.com/reel/` | Whisper |
+| 페이스북 | `facebook.com/watch`, `fb.watch` | Whisper |
+| 틱톡 | `tiktok.com/@…/video/` | Whisper |
+| X(트위터) | `x.com/…/status/` | 자막, 없으면 Whisper |
+
+영상이 없는 링크(일반 웹페이지, 틱톡 사진 슬라이드 등)는 "영상 아님"으로 알려 주고 건너뜁니다.
 
 <details>
 <summary>데이터베이스 속성 (참고용 — 자동 생성됨)</summary>
@@ -115,8 +131,8 @@ Claude Code에서 두 줄이면 됩니다 (Claude Code 2.1.275 이상).
 |------|------|------|
 | 이름 | 제목 | 영상 주제를 짧게 정리한 제목 |
 | 순번 | 숫자 | 1부터 자동 증가 (정렬 기준) |
-| 영상 제목 | 텍스트 | 유튜브 원제목 (릴스는 캡션 첫 줄) |
-| 채널 | 선택 | 유튜브 채널 / 릴스 작성자 계정 |
+| 영상 제목 | 텍스트 | 원제목 (제목 없는 숏폼은 캡션 첫 줄) |
+| 채널 | 선택 | 유튜브 채널 / 숏폼 작성자 계정 |
 | 설명 | 텍스트 | 한 줄 설명 |
 | 태그 | 다중 선택 | 영상 속 도구·기능·인물 |
 | 기록날짜 | 날짜 | 정리한 날 |
@@ -129,16 +145,16 @@ Claude Code에서 두 줄이면 됩니다 (Claude Code 2.1.275 이상).
 Claude Code에서:
 
 ```
-/youtube-to-notion
+/feed-me-knowledge
 ```
 
-(플러그인으로 설치하면 `/youtube-to-notion:youtube-to-notion`으로 보일 수 있습니다) 또는 "대기 영상 정리해줘". 끝나면 성공·실패 목록과 새 페이지 링크를 알려 줍니다.
+(플러그인으로 설치하면 `/feed-me-knowledge:feed-me-knowledge`으로 보일 수 있습니다) 또는 "대기 영상 정리해줘". 끝나면 성공·실패 목록과 새 페이지 링크를 알려 줍니다.
 
 ## 참고와 주의
 
 - 영상 하나가 실패해도 나머지는 계속 처리합니다.
-- 자막이 없는 영상과 릴스는 오디오가 Groq 서버로 전송됩니다.
-- 인스타그램은 로그인 없이 받을 수 있는 공개 릴스만 처리합니다.
+- 자막이 없는 영상은 오디오가 Groq 서버로 전송됩니다.
+- 로그인 없이 받을 수 있는 공개 영상만 처리합니다 (비공개 계정·로그인 필요 영상 제외).
 - 아주 긴 영상은 Groq 업로드 크기 제한에 걸릴 수 있습니다.
 - 요약은 한국어로 작성되도록 되어 있습니다. 다른 언어가 필요하면 `SKILL.md`의 "한국어로 작성" 줄을 바꾸세요.
 

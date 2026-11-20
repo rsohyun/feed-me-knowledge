@@ -1,21 +1,21 @@
 {
-  "name": "youtube-to-notion",
+  "name": "feed-me-knowledge",
   "owner": {
     "name": "rsohyun"
   },
   "metadata": {
-    "description": "Queue YouTube / Instagram reel links on a Notion page, run one command, get study notes in a Notion database."
+    "description": "Queue video links (YouTube, Instagram, Facebook, TikTok, X) on a Notion page, run one command, get study notes in a Notion database."
   },
   "plugins": [
     {
-      "name": "youtube-to-notion",
-      "description": "Summarize queued YouTube videos and Instagram reels into a Notion database (captions or Groq Whisper). Requires the watch plugin.",
+      "name": "feed-me-knowledge",
+      "description": "Summarize queued videos (YouTube, Instagram reels, Facebook, TikTok, X) into a Notion database (captions or Groq Whisper). Requires the watch plugin.",
       "author": {
         "name": "rsohyun"
       },
       "source": "./",
       "category": "productivity",
-      "homepage": "https://github.com/rsohyun/youtube-to-notion"
+      "homepage": "https://github.com/rsohyun/feed-me-knowledge"
     }
   ]
 }
