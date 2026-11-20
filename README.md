@@ -42,8 +42,6 @@
 
 **② 노트북에서 한 줄 실행** — Claude Code에서 `/feed-me-knowledge`을 입력하면 자막(없으면 음성 받아쓰기)을 받고, 도구·인물 이름이 애매하면 해당 장면만 캡처해 확인한 뒤 요약합니다.
 
-<img src="docs/images/02-run.png" width="620" alt="Claude Code 실행 화면">
-
 **③ 데이터베이스에 정리 완료** — 순번·설명·분류·태그가 채워진 새 행이 맨 아래에 쌓이고, 처리한 링크는 자동으로 체크(또는 `(완료)` 표시)됩니다.
 
 <img src="docs/images/03-db-row.png" alt="데이터베이스에 추가된 행">
