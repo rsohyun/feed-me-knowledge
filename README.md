@@ -2,9 +2,9 @@
 
 # feed-me-knowledge
 
-> 🍽️ 영상을 먹여 주면 지식으로 소화해 주는 스킬. (이전 이름: `youtube-to-notion` — 기존 설정은 그대로 이어집니다)
+> 🍽️ 영상을 먹여주면  지식으로 소화해 주는 스킬. (이전 이름: `youtube-to-notion`)
 
-> Notion 페이지에 영상 링크(유튜브·인스타그램 릴스·페이스북·틱톡·X)를 쌓아 두고, Claude Code에서 `/feed-me-knowledge` 한 번이면 영상을 요약해 Notion 데이터베이스에 정리해 주는 Claude Code 스킬.
+> Notion 페이지에 영상 링크(유튜브·인스타그램 릴스·페이스북·틱톡·X)를 쌓아 두고, Claude Code에서 `/feed-me-knowledge` 스킬 호출 한 번이면 영상을 요약해 Notion 데이터베이스에 정리해 주는 Claude Code 스킬.
 
 - 자막이 있으면 자막으로, **자막이 없으면 Groq Whisper로 받아써서** 정리합니다.
 - **유튜브 말고도 인스타그램 릴스·페이스북·틱톡·X(트위터) 영상을 지원합니다.** 짧은 영상은 간단한 형식으로 정리하고, 썸네일은 만료되지 않도록 Notion에 직접 올립니다.
